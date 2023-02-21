@@ -58,9 +58,7 @@ if(window.rulesengine==null) {
                         "Expression": builtExpression
                     });
                     sequence[rule.parameter] = sequence[rule.parameter] + 10;
-                    if(window.rulesengine.input.Parameters[rule.parameter]==null) {
-                        window.rulesengine.input.Parameters[rule.parameter] = null;
-                    }
+                    window.rulesengine.input.Parameters[rule.parameter] = rule.element.getValue();
                     if(rule.element.rules==null) {
                         rule.element.rules = [];
                     }
@@ -150,12 +148,12 @@ if(window.rulesengine==null) {
                                     var eSubmit = this;
                                     require(["jquery"], function($) {
                                         var eInput = $("#"+eSubmit.id.replace("Submit", ""))[0];
-                                        window.rulesengine.input.Parameters[eInput.id] = eInput.value;
+                                        window.rulesengine.input.Parameters[eInput.id] = eInput.getValue();
                                         window.rulesengine.input.Parameters[eInput.id+"Valid"] = eInput.isValid();
                                         window.rulesengine.run(eSubmit.elements, eSubmit.callback);
                                     });
                                 };
-                                window.rulesengine.elements = {
+                                window.rulesengine.elementsResponse = {
                                     "input": eInput,
                                     "feedback":eFeedback,
                                     "submit":eSubmit
@@ -178,11 +176,11 @@ if(window.rulesengine==null) {
             }
         },
         "getElementsFromResult": function() {
-            return window.rulesengine.elements;
+            return window.rulesengine.elementsResponse;
         },
         "submit": function() {
-            if(window.rulesengine.elements!=null && window.rulesengine.elements.submit !=null) {
-                window.rulesengine.elements.submit.onclick();
+            if(window.rulesengine.elementsResponse!=null && window.rulesengine.elementsResponse.submit !=null) {
+                window.rulesengine.elementsResponse.submit.onclick();
             }
         }
     };
