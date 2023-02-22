@@ -64,7 +64,7 @@ if(window.rulesengine==null) {
                     }
                     rule.element.isValid = function() {
                         var result = true;
-                        window.rulesengine.errorMessage = null;
+                        this.errorMessages = [];
                         var value = this.getValue();
                         var iRules;
                         for(iRules=0;iRules<this.rules.length;iRules++) {
@@ -72,8 +72,7 @@ if(window.rulesengine==null) {
                             try {
                                 if(!value.match(format)) {
                                     result = false;
-                                    window.rulesengine.errorMessage = rules[iRules].errorMessage;
-                                    break;
+                                    this.errorMessages.push(rules[iRules].errorMessage);
                                 }
                             }
                             catch(ex) {
@@ -83,19 +82,6 @@ if(window.rulesengine==null) {
                         return result;
                     };
                     window.rulesengine.input.Parameters[rule.parameter+"Valid"] = rule.element.isValid();
-                    try {
-                        var iRules;
-                        var found = false;
-                        for(iRules=0;iRules<rules.length;iRules++) {
-                            var rule2 = rules[iRules];
-                            if(rule2.parameter==rule.parameter && rule2.errorMessage==rule.errorMessage && rule2.format==rule.format && rule2.expression==rule.expression) {
-                                found = true;
-                                break;
-                            }
-                        }
-                    }
-                    catch(ex) {
-                    }
                 }
                 require(["jquery"], function($) {
                     if(window.rulesengine.url==null) {
@@ -105,12 +91,12 @@ if(window.rulesengine==null) {
                         cb(null);
                     }
                     var params = {};
-                    params[window.rulesengine.urlParameters[0]] = JSON.stringify(workflow);
-                    params[window.rulesengine.urlParameters[1]] = JSON.stringify(window.rulesengine.input);
+                    params = JSON.stringify([JSON.stringify(workflow), JSON.stringify(window.rulesengine.input)]);
                     if(window.rulesengine.url.startsWith("data:")) {
                         params = {};
                     }
-                    $.get(window.rulesengine.url, params, function(data, status) {
+                    window.rulesengine.elements = elements;
+                    $.post(window.rulesengine.url, params, function(data, status) {
                         if(data instanceof Array) {
                             if(data.length==0) {
                                 cb({"result":"OK","invalidParameter":null,"errorMessage":null});
@@ -119,8 +105,22 @@ if(window.rulesengine==null) {
                             var iData = 0;
                             var data2 = data[iData];
                             for(iData=0;iData<data.length;iData++) {
-                                if((window.rulesengine.errorMessage==null && data[iData].IsSuccess==false) || data[iData].Rule.ErrorMessage == window.rulesengine.errorMessage) {
+                                if(data[iData].IsSuccess==false) {
                                     data2 = data[iData];
+                                    var errorMessage = data[iData].Rule.ErrorMessage;
+                                    var iElement;
+                                    for(iElement=0;iElement<window.rulesengine.elements.length;iElement++) {
+                                        var element = window.rulesengine.elements[iElement];
+                                        var iErrorMessage;
+                                        for(iErrorMessage=0;iErrorMessage<element.errorMessages.length;iErrorMessage++) {
+                                            if(element.errorMessages[iErrorMessage]==errorMessage) {
+                                                data2 = data[iData];
+                                                break;
+                                            }
+                                        }
+                                        break;
+                                    }
+                                    break;
                                 }
                             }
                             if(data2.IsSuccess==false) {
@@ -138,6 +138,9 @@ if(window.rulesengine==null) {
                                 eFeedback.id = key+"Feedback";
                                 eFeedback.style="color:red";
                                 eFeedback.innerText = data2.Rule.ErrorMessage;
+                                if(eInput.errorMessages!=null && eInput.errorMessages.length>0) {
+                                    eFeedback.innerText = eInput.errorMessages[0];
+                                }
                                 var eSubmit = document.createElement("input");
                                 eSubmit.type = "button";
                                 eSubmit.value = "Submit";
@@ -189,4 +192,3 @@ define("RulesEngine", [], function() {
     window.rulesengine.initialize();
     return window.rulesengine;
 });
-
