@@ -164,6 +164,7 @@ if(window.rulesengine==null) {
                                 cb({
                                     "result":"NOK","invalidParameter":data2.Rule.RuleName,"errorMessage":data2.Rule.ErrorMessage
                                 });
+                                return;
                             }
                             else {
                                 cb({"result":"OK","invalidParameter":null,"errorMessage":null});
@@ -171,6 +172,7 @@ if(window.rulesengine==null) {
                             }
                         }
                         cb({"result":"OK","invalidParameter":null,"errorMessage":null});
+                        return;
                     });
                 });
             }
