@@ -68,11 +68,15 @@ if(window.rulesengine==null) {
                         var value = this.getValue();
                         var iRules;
                         for(iRules=0;iRules<this.rules.length;iRules++) {
-                            var format = rules[iRules].format;
+                            var format = this.rules[iRules].format;
                             try {
+                                if(value==null && !"".match(format)) {
+                                    result = false;
+                                    this.errorMessages.push(this.rules[iRules].errorMessage);
+                                }
                                 if(!value.match(format)) {
                                     result = false;
-                                    this.errorMessages.push(rules[iRules].errorMessage);
+                                    this.errorMessages.push(this.rules[iRules].errorMessage);
                                 }
                             }
                             catch(ex) {
