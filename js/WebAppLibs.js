@@ -11,7 +11,7 @@ var WebAppLibs = new Object();
 WebAppLibs.initialize = function() {
     var stylesheet = document.createElement("link");
     stylesheet.rel = "stylesheet";
-    stylesheet.href = "../css/oj-redwood-dark.css";
+    stylesheet.href = "https://cdn.jsdelivr.net/gh/MJJWalraven/Insystems_KGO@r10/css/oj-redwood-dark.css";
     document.head.appendChild(stylesheet);
     var stylesheet2 = document.createElement("link");
     stylesheet2.rel = "stylesheet";
